@@ -12,5 +12,6 @@
     <string name="are_you_a_driver_or_passenger">Are you a Driver or Passenger?</string>
     <string name="don_t_want_to_sig_up_or_login">Don\'t want to sig up or login?</string>
     <string name="sign_up">Sign Up</string>
+    <string name="login">Login</string>
 
 </resources>

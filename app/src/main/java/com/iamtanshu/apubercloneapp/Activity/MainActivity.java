@@ -3,22 +3,65 @@ package com.iamtanshu.apubercloneapp.Activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.iamtanshu.apubercloneapp.R;
 import com.parse.Parse;
+import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    EditText edtUserName, edtPassword, edtTypePerson;
+    Button btn_SignUp, btn_OTL;
+    RadioButton rb_Driver, rb_Passenger;
+    RadioGroup rg_Type;
+
+
+    enum State {
+        SIGNUP, LOGIN
+    }
+
+    State state = State.SIGNUP;
+
+    private static MainActivity instance = null;
+
+    public static MainActivity getInstance() {
+        instance = instance == null ? new MainActivity() : instance;
+        return instance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ParseInstallation.getCurrentInstallation().saveInBackground();
+        if (ParseUser.getCurrentUser() != null) {
+            ParseUser.logOut();
+        }
+        edtUserName = findViewById(R.id.edt_UserName);
+        edtPassword = findViewById(R.id.edt_Password);
+        edtTypePerson = findViewById(R.id.edt_PersonType);
+
+        rg_Type = findViewById(R.id.rg_TypePerson);
+        rb_Driver = findViewById(R.id.rb_Driver);
+        rb_Passenger = findViewById(R.id.rb_Passenger);
+
+        btn_SignUp = findViewById(R.id.btn_signUp);
+        btn_OTL = findViewById(R.id.btn_OTL);
+        btn_SignUp.setOnClickListener(this);
+        btn_OTL.setOnClickListener(this);
 
     }
 
@@ -32,9 +75,72 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_sign_up:
-                Toast.makeText(this, "Sign Up is Clicked", Toast.LENGTH_SHORT).show();
+                state = state == State.SIGNUP ? State.LOGIN : State.SIGNUP;
+                switch (state) {
+                    case SIGNUP:
+                        item.setTitle(getResources().getString(R.string.login));
+                        btn_SignUp.setText(getResources().getString(R.string.sign_up));
+                        break;
+                    case LOGIN:
+                        item.setTitle(getResources().getString(R.string.sign_up));
+                        btn_SignUp.setText(getResources().getString(R.string.login));
+                        break;
+                }
                 break;
         }
-        return true ;
+        return true;
     }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_signUp:
+                String username = edtUserName.getText().toString().trim();
+                String password = edtUserName.getText().toString().trim();
+                if (username.equals("") || password.equals("")) {
+                    Toast.makeText(MainActivity.this, "Username and Password are required..", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
+
+                switch (state) {
+                    case SIGNUP:
+                        if (rg_Type.getCheckedRadioButtonId() == -1) {
+                            Toast.makeText(MainActivity.this, "Are you a driver or passenger?", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        String type = rb_Driver.isChecked() ? "Driver" : "Passenger";
+                        final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
+                        dialog.setMessage("Signing up the user");
+                        dialog.setCancelable(false);
+                        dialog.show();
+
+                        ParseUser user = new ParseUser();
+                        user.setUsername(username);
+                        user.setPassword(password);
+                        user.put("as", type.trim());
+                        user.signUpInBackground(new SignUpCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                dialog.dismiss();
+                                if (e != null) {
+                                    Toast.makeText(MainActivity.this, "Signing up user fail.", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                Toast.makeText(MainActivity.this, "User is sign up.", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+                        break;
+                    case LOGIN:
+                        break;
+                }
+                break;
+            case R.id.btn_OTL:
+                break;
+        }
+    }
+
 }
