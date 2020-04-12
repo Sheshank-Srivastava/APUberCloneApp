@@ -3,5 +3,14 @@
     <string name="back4app_app_id">nCfPU3dJkqJEVeqyvLX9Rideft8fGWptSkXn1g0i</string>
     <string name="back4app_client_key">edcX9gUY4a0cjNHfUVbHT0PmrjkMTlemEfQcF6EK</string>
     <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <string name="passenger">Passenger</string>
+    <string name="driver">Driver</string>
+    <string name="please_enter_your_password">Please Enter Your Password</string>
+    <string name="please_enter_your_username">Please Enter Your UserName</string>
+    <string name="todo">TODO</string>
+    <string name="otl">One time login</string>
+    <string name="are_you_a_driver_or_passenger">Are you a Driver or Passenger?</string>
+    <string name="don_t_want_to_sig_up_or_login">Don\'t want to sig up or login?</string>
+    <string name="sign_up">Sign Up</string>
 
 </resources>
