@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">APUberCloneApp</string>
+    <string name="back4app_app_id">nCfPU3dJkqJEVeqyvLX9Rideft8fGWptSkXn1g0i</string>
+    <string name="back4app_client_key">edcX9gUY4a0cjNHfUVbHT0PmrjkMTlemEfQcF6EK</string>
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+
 </resources>
