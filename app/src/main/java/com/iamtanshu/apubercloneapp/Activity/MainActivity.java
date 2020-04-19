@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +16,9 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.iamtanshu.apubercloneapp.R;
+import com.parse.LogInCallback;
 import com.parse.Parse;
+import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
 import com.parse.ParseInstallation;
 import com.parse.ParseUser;
@@ -46,7 +49,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ParseInstallation.getCurrentInstallation().saveInBackground();
         if (ParseUser.getCurrentUser() != null) {
             ParseUser.logOut();
         }
@@ -62,6 +64,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_OTL = findViewById(R.id.btn_OTL);
         btn_SignUp.setOnClickListener(this);
         btn_OTL.setOnClickListener(this);
+        if (ParseUser.getCurrentUser() != null) {
+            tranisitionToMain();
+        }
 
     }
 
@@ -95,13 +100,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_signUp:
-                String username = edtUserName.getText().toString().trim();
+                final String username = edtUserName.getText().toString().trim();
                 String password = edtUserName.getText().toString().trim();
                 if (username.equals("") || password.equals("")) {
                     Toast.makeText(MainActivity.this, "Username and Password are required..", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
 
 
                 switch (state) {
@@ -110,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.makeText(MainActivity.this, "Are you a driver or passenger?", Toast.LENGTH_SHORT).show();
                             return;
                         }
-
                         String type = rb_Driver.isChecked() ? "Driver" : "Passenger";
                         final ProgressDialog dialog = new ProgressDialog(MainActivity.this);
                         dialog.setMessage("Signing up the user");
@@ -130,17 +133,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     return;
                                 }
                                 Toast.makeText(MainActivity.this, "User is sign up.", Toast.LENGTH_SHORT).show();
-
+                                tranisitionToMain();
                             }
                         });
                         break;
                     case LOGIN:
+                        final ProgressDialog loginDialog = new ProgressDialog(MainActivity.this);
+                        loginDialog.setMessage("Logging-in..");
+                        loginDialog.setCancelable(false);
+                        loginDialog.show();
+                        ParseUser.logInInBackground(username, password, new LogInCallback() {
+                            @Override
+                            public void done(ParseUser user, ParseException e) {
+                                loginDialog.dismiss();
+                                if (user == null || e != null) {
+                                    Toast.makeText(MainActivity.this, "Invalid username and password", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                Toast.makeText(MainActivity.this, user.getUsername() + " logged-in successfully.", Toast.LENGTH_SHORT).show();
+                                tranisitionToMain();
+                            }
+                        });
                         break;
                 }
                 break;
             case R.id.btn_OTL:
+                final String type = edtTypePerson.getText().toString().trim();
+                if (type.equals("Driver") || type.equals("Passenger")) {
+                    if (ParseUser.getCurrentUser() == null) {
+                        ParseAnonymousUtils.logIn(new LogInCallback() {
+                            @Override
+                            public void done(ParseUser user, ParseException e) {
+                                if (user != null && e == null) {
+                                    Toast.makeText(MainActivity.this, "We have an anonymous user", Toast.LENGTH_SHORT).show();
+                                    user.put("as", type);
+                                    user.saveInBackground();
+                                }
+
+                            }
+                        });
+                    }
+                }
                 break;
         }
+    }
+
+    private void tranisitionToMain() {
+        Intent intent = new Intent(MainActivity.this, TransitionActivity.class);
+        startActivity(intent);
+        finish();
     }
 
 }

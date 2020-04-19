@@ -13,5 +13,6 @@
     <string name="don_t_want_to_sig_up_or_login">Don\'t want to sig up or login?</string>
     <string name="sign_up">Sign Up</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
 
 </resources>
