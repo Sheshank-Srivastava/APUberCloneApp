@@ -1,9 +1,7 @@
 package com.iamtanshu.apubercloneapp.Activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,14 +13,21 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.iamtanshu.apubercloneapp.R;
+import com.mahindra.cmlibrary.CMBridge;
+import com.mahindra.cmlibrary.ModuleActivity;
 import com.parse.LogInCallback;
-import com.parse.Parse;
 import com.parse.ParseAnonymousUtils;
 import com.parse.ParseException;
-import com.parse.ParseInstallation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
+
+import java.sql.Driver;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -30,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btn_SignUp, btn_OTL;
     RadioButton rb_Driver, rb_Passenger;
     RadioGroup rg_Type;
+
 
 
     enum State {
@@ -49,9 +55,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (ParseUser.getCurrentUser() != null) {
-            ParseUser.logOut();
-        }
+
         edtUserName = findViewById(R.id.edt_UserName);
         edtPassword = findViewById(R.id.edt_Password);
         edtTypePerson = findViewById(R.id.edt_PersonType);
@@ -65,8 +69,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_SignUp.setOnClickListener(this);
         btn_OTL.setOnClickListener(this);
         if (ParseUser.getCurrentUser() != null) {
-            tranisitionToMain();
+            tranisitionToPassengerActivity();
         }
+
 
     }
 
@@ -133,7 +138,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     return;
                                 }
                                 Toast.makeText(MainActivity.this, "User is sign up.", Toast.LENGTH_SHORT).show();
-                                tranisitionToMain();
+                                tranisitionToPassengerActivity();
+
                             }
                         });
                         break;
@@ -151,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     return;
                                 }
                                 Toast.makeText(MainActivity.this, user.getUsername() + " logged-in successfully.", Toast.LENGTH_SHORT).show();
-                                tranisitionToMain();
+                                tranisitionToPassengerActivity();
                             }
                         });
                         break;
@@ -167,7 +173,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 if (user != null && e == null) {
                                     Toast.makeText(MainActivity.this, "We have an anonymous user", Toast.LENGTH_SHORT).show();
                                     user.put("as", type);
-                                    user.saveInBackground();
+                                    user.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            tranisitionToPassengerActivity();
+                                        }
+                                    });
                                 }
 
                             }
@@ -178,10 +189,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void tranisitionToMain() {
-        Intent intent = new Intent(MainActivity.this, TransitionActivity.class);
-        startActivity(intent);
-        finish();
+    private void tranisitionToPassengerActivity() {
+        if (ParseUser.getCurrentUser() != null) {
+            Intent intent = null;
+            String type = (String) Objects.requireNonNull(ParseUser.getCurrentUser().get("as"));
+            switch (type) {
+                case "Driver":
+                    intent = new Intent(MainActivity.this, TransitionActivity.class);
+                    break;
+                case "Passenger":
+                    intent = new Intent(MainActivity.this, PassengerActivity.class);
+                    break;
+            }
+            if (intent != null) {
+                startActivity(intent);
+                finish();
+            }
+
+        }
     }
+
 
 }

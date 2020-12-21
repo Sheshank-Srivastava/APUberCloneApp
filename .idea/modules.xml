@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/APUberCloneApp.iml" filepath="$PROJECT_DIR$/APUberCloneApp.iml" group="APUberCloneApp" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="APUberCloneApp/app" />
+      <module fileurl="file://$PROJECT_DIR$/APUberCloneApp.iml" filepath="$PROJECT_DIR$/APUberCloneApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/APUberCloneApp.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/APUberCloneApp.app.iml" />
     </modules>
   </component>
 </project>
